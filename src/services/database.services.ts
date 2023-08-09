@@ -4,7 +4,6 @@ import dotenvn from 'dotenv'
 import User from '~/models/schemas/user.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 dotenvn.config()
-console.log(process.env.DB_USERNAME)
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.7wraadj.mongodb.net/?retryWrites=true&w=majority`
 
@@ -30,14 +29,12 @@ class DatabaseService {
     }
   }
 
-  //insert into the database collection(table) users
+  //database collection(table) users
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
-  //insert into the database collection(table) refresh_tokens
+  //database collection(table) refresh_tokens
   get refreshTokens(): Collection<RefreshToken> {
-    console.log('asdasd')
-
     return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
   }
 }
