@@ -20,7 +20,7 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
 
     for (const key in errorsObject) {
       const { msg } = errorsObject[key]
-      //trả về lỗi kp do validate
+      //trả về lỗi kp do validate 422
       if (msg instanceof ErrorWithStatus && msg.status !== HTTP_STATUS.UNPROCESSABLE_ENTITY) {
         return next(msg)
       }

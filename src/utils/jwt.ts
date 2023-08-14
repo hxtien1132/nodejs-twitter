@@ -5,14 +5,14 @@ config()
 //chuyển thành JWT
 export const signToken = ({
   payload,
-  privateKey = process.env.JWT_SECRET as string,
+  privateKey,
   options = {
     algorithm: 'HS256'
   }
 }: {
   // eslint-disable-next-line @typescript-eslint/ban-types
   payload: string | Buffer | Object
-  privateKey?: string
+  privateKey: string
   options?: SignOptions
 }) => {
   return new Promise<string>((resolve, reject) => {
@@ -26,13 +26,7 @@ export const signToken = ({
 }
 
 //xác thực token (giải mã token ra)
-export const verifyToken = ({
-  token,
-  secretOrPublickey = process.env.JWT_SECRET as string
-}: {
-  token: string
-  secretOrPublickey?: string
-}) => {
+export const verifyToken = ({ token, secretOrPublickey }: { token: string; secretOrPublickey: string }) => {
   return new Promise<TokenPayload>((resolve, reject) => {
     jwt.verify(token, secretOrPublickey, (error, decoded) => {
       if (error) {
