@@ -15,6 +15,6 @@ export const defaultErrorHandler = (err: any, req: Request, res: Response, next:
   //err 500
   res.status(HTTP_STATUS.INTERNAL_SEVER_ERROR).json({
     message: err.message,
-    errorInfo: err //omit(err, ['stack'])
+    errorInfo: omit(err, ['stack'])
   })
 }

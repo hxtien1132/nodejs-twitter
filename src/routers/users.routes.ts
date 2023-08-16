@@ -14,7 +14,8 @@ import {
   followController,
   unFollowController,
   changePasswordController,
-  oauthController
+  oauthController,
+  refreshTokenController
 } from '~/controllers/users.controllers'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
 import {
@@ -68,6 +69,14 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  */
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
 
+//
+/**
+ * Description. Refresh Token
+ * Path: /refresh-token
+ * Method: POST
+ * Body: { refresh_token: string }
+ */
+usersRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 //
 /**
  * Description. Verify email when user client click on the link in email
@@ -181,6 +190,13 @@ usersRouter.post(
 //
 
 //
+
+/**
+ * Description: Follow someone
+ * Path: /follow/user_id
+ * Method: DELETE
+ * Header: { Authorization: Bearer <access_token> }
+ */
 usersRouter.delete(
   '/follow/:user_id',
   accessTokenValidator,
@@ -191,9 +207,16 @@ usersRouter.delete(
 //
 
 //
+/**
+ * Description: Change password
+ * Path: /change-password
+ * Method: PUT
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { old_password: string, password: string, confirm_password: string }
+ */
 usersRouter.put(
   '/change-password',
-  accessTokenValidator,
+  refreshTokenValidator,
   verifiedUserValidator,
   changePasswordValidator,
   wrapRequestHandler(changePasswordController)
