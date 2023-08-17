@@ -1,10 +1,10 @@
 import { Request } from 'express'
 import formidable from 'formidable'
 import fs from 'fs'
-import path from 'path'
 import { File } from 'formidable'
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
 
+//create folder
 export const initFolder = () => {
   ;[UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_TEMP_DIR].forEach((dir) => {
     if (!fs.existsSync(dir)) {
@@ -14,17 +14,11 @@ export const initFolder = () => {
     }
   })
 }
-export const getNameFromFullname = (fullname: string) => {
-  const namearr = fullname.split('.')
-  namearr.pop()
-  return namearr.join('')
-}
 
 //c
 export const handleUploadImage = async (req: Request) => {
   //import kiểu common module vì cái này là es module
   // const formidable = (await import('formidable')).default
-
   //setup ảnh
   const form = formidable({
     uploadDir: UPLOAD_IMAGE_TEMP_DIR,
@@ -44,7 +38,7 @@ export const handleUploadImage = async (req: Request) => {
   return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       // console.log('fields', fields)
-      // console.log('files', files)
+      console.log('files', files)
       if (err) {
         return reject(err)
       }
@@ -99,6 +93,14 @@ export const handleUploadVideo = async (req: Request) => {
   })
 }
 
+// handle name file
+//loại bỏ đuôi .png
+export const getNameFromFullname = (fullname: string) => {
+  const namearr = fullname.split('.')
+  namearr.pop()
+  return namearr.join('')
+}
+//
 export const getExtension = (fullname: string) => {
   const nameArr = fullname.split('.')
   return nameArr[nameArr.length - 1]
