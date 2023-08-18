@@ -69,7 +69,7 @@ export const handleUploadVideo = async (req: Request) => {
       return valid
     }
   })
-  // trả về thông tim image
+  // trả về thông tim VIDEO
   return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       // console.log('fields', fields)
@@ -94,7 +94,7 @@ export const handleUploadVideo = async (req: Request) => {
 }
 
 // handle name file
-//loại bỏ đuôi .png
+//loại bỏ đuôi .
 export const getNameFromFullname = (fullname: string) => {
   const namearr = fullname.split('.')
   namearr.pop()

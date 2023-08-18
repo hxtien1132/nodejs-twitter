@@ -23,12 +23,12 @@ mediasRouter.post(
 )
 
 //plus
-mediasRouter.post(
-  '/upload-video-hls',
-  accessTokenValidator,
-  verifiedUserValidator,
-  wrapRequestHandler(uploadVideoHLSController)
-)
+// mediasRouter.post(
+//   '/upload-video-hls',
+//   accessTokenValidator,
+//   verifiedUserValidator,
+//   wrapRequestHandler(uploadVideoHLSController)
+// )
 
 mediasRouter.get(
   '/video-status/:id',

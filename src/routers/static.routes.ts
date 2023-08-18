@@ -13,6 +13,6 @@ staticRouter.get('/video-stream/:name', serveVideoStreamController)
 //
 //
 //plus
-staticRouter.get('/video-hls/:id/master.m3u8', serveM3u8Controller)
-staticRouter.get('/video-hls/:id/:v/:segment', serveSegmentController)
+// staticRouter.get('/video-hls/:id/master.m3u8', serveM3u8Controller)
+// staticRouter.get('/video-hls/:id/:v/:segment', serveSegmentController)
 export default staticRouter
