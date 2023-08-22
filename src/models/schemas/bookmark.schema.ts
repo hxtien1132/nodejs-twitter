@@ -6,6 +6,8 @@ interface BookmarkType {
   tweet_id: ObjectId
   created_at?: Date
 }
+
+//những ai đã tweet
 export default class Bookmark {
   _id: ObjectId
   user_id: ObjectId

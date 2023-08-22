@@ -134,14 +134,19 @@ class MediasService {
   }
   async uploadVideo(req: Request) {
     const files = await handleUploadVideo(req)
-    const result: Media[] = files.map((file) => {
-      return {
-        url: isProduction
-          ? `${process.env.HOST}/static/video/${file.newFilename}`
-          : `http://localhost:${process.env.PORT}/static/video/${file.newFilename}`,
-        type: MediaType.Video
-      }
-    })
+    const result: Media[] = await Promise.all(
+      files.map(async (file) => {
+        await queue.enqueue(file.filepath)
+        console.log(file.filepath)
+
+        return {
+          url: isProduction
+            ? `${process.env.HOST}/static/video/${file.newFilename}`
+            : `http://localhost:${process.env.PORT}/static/video/${file.newFilename}`,
+          type: MediaType.Video
+        }
+      })
+    )
     return result
   }
   //
@@ -158,7 +163,7 @@ class MediasService {
       files.map(async (file) => {
         // await encodeHLSWithMultipleVideoStreams(file.filepath)
         const newName = getNameFromFullname(file.newFilename)
-        queue.enqueue(file.filepath)
+        // await queue.enqueue(file.filepath)
         // await fsPromise.unlink(file.filepath)
         return {
           url: isProduction

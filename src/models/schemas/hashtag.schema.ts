@@ -5,6 +5,7 @@ interface HashtagType {
   name: string
   created_at?: Date
 }
+//name người được tag vào tweet của người đó
 export default class Hashtag {
   _id?: ObjectId
   name: string

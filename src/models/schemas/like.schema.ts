@@ -6,6 +6,7 @@ interface LikeType {
   tweet_id: ObjectId
   created_at?: Date
 }
+//người đã like vào tweet của người đó
 export default class Like {
   _id: ObjectId
   user_id: ObjectId

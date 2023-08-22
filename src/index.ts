@@ -10,6 +10,7 @@ import staticRouter from './routers/static.routes'
 import tweetsRouter from './routers/tweets.routes'
 import bookmarksRouter from './routers/bookmarks.routes'
 import likesRouter from './routers/likes.routes'
+// import '~/utils/fake'
 config()
 const app = express()
 const port = process.env.PORT || 4000
@@ -21,9 +22,9 @@ databaseService.connect().then(() => {
   databaseService.indexRefreshTokens()
   // databaseService.indexVideoStatus()
   databaseService.indexFollowers()
-  // databaseService.indexTweets()
+  databaseService.indexTweets()
 })
-app.use(express.json()) //convert object
+app.use(express.json()) //Sử dụng express.json() middleware để xử lý dữ liệu JSON trong yêu cầu
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/tweets', tweetsRouter)

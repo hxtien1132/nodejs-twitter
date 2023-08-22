@@ -232,7 +232,7 @@ class UserService {
         password: hashPassword(payload.password)
       })
     )
-    console.log('email_verify_token', email_verify_token)
+    // console.log('email_verify_token', email_verify_token)
 
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id: user_id.toString(),
@@ -332,7 +332,8 @@ class UserService {
       }
     )
     return {
-      message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
+      message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS,
+      email_verify_token: email_verify_token
     }
   }
   //

@@ -71,12 +71,12 @@ class DatabaseService {
       this.followers.createIndex({ user_id: 1, followed_user_id: 1 })
     }
   }
-  // async indexTweets() {
-  //   const exists = await this.tweets.indexExists(['content_text'])
-  //   if (!exists) {
-  //     this.tweets.createIndex({ content: 'text' }, { default_language: 'none' })
-  //   }
-  // }
+  async indexTweets() {
+    const exists = await this.tweets.indexExists(['content_text'])
+    if (!exists) {
+      this.tweets.createIndex({ content: 'text' }, { default_language: 'none' })
+    }
+  }
 
   // truy vấn đến database collection(table) users
   get users(): Collection<User> {

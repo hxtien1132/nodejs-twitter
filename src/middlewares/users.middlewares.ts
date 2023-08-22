@@ -291,6 +291,7 @@ export const accessTokenValidator = validate(
       Authorization: {
         custom: {
           options: async (value: string, { req }) => {
+            //token k truyền
             const access_token = (value || '').split(' ')[1]
             if (!access_token) {
               throw new ErrorWithStatus({
@@ -306,6 +307,7 @@ export const accessTokenValidator = validate(
               })
               ;(req as Request).decoded_authorization = decoded_authorization
             } catch (error) {
+              //token sai
               throw new ErrorWithStatus({
                 message: 'token error', //capitalize((error as JsonWebTokenError).message)
                 status: HTTP_STATUS.UNAUTHORIZED
@@ -343,7 +345,6 @@ export const refreshTokenValidator = validate(
                 databaseService.refreshTokens.findOne({ token: value })
               ])
               if (refresh_token === null) {
-                //token rỗng {}
                 throw new ErrorWithStatus({
                   message: USERS_MESSAGES.USED_REFRESH_TOKEN_OR_NOT_EXISTENT,
                   status: HTTP_STATUS.UNAUTHORIZED
@@ -655,3 +656,15 @@ export const changePasswordValidator = validate(
     confirm_password: confirmPasswordSchema
   })
 )
+
+//
+//
+//
+export const isUserLoggedInValidator = (middleware: (req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next)
+    }
+    next()
+  }
+}
