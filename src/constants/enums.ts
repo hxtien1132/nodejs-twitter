@@ -20,6 +20,11 @@ export enum MediaTypeQuery {
   Video = 'video'
 }
 
+export enum PeopleFollow {
+  Anyone = '0',
+  Following = '1'
+}
+
 export enum EncodingStatus {
   Pending, // Đang chờ ở hàng đợi (chưa được encode)
   Processing, // Đang encode

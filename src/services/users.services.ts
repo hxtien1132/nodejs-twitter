@@ -12,6 +12,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import Follower from '~/models/schemas/follower.schema'
 import axios from 'axios'
+import { sendForgotPasswordEmail, sendVerifyRegisterEmail } from '~/utils/email'
 config()
 class UserService {
   //create access token
@@ -97,7 +98,7 @@ class UserService {
       secretOrPublickey: process.env.JWT_SECRET_REFRESH_TOKEN as string
     })
   }
-  //getOauthGoogleToken
+  //getOauthGoogleToken(check )
   private async getOauthGoogleToken(code: string) {
     const body = {
       code,
@@ -118,6 +119,7 @@ class UserService {
       id_token: string
     }
   }
+  //lấy thông tin khi xác nhận xong
   private async getGoogleUserInfo(access_token: string, id_token: string) {
     const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
       params: {
@@ -128,7 +130,7 @@ class UserService {
         Authorization: `Bearer ${id_token}`
       }
     })
-    console.log(data)
+    // console.log(data)
 
     return data as {
       id: string
@@ -243,6 +245,16 @@ class UserService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
+
+    // Flow verify email
+    // 1. Server send email to user
+    // 2. User click link in email
+    // 3. Client send request to server with email_verify_token
+    // 4. Server verify email_verify_token
+    // 5. Client receive access_token and refresh_token
+
+    //cmt
+    // await sendVerifyRegisterEmail(payload.email, email_verify_token) //send Email
     return { access_token, refresh_token }
   }
   //
@@ -312,12 +324,13 @@ class UserService {
   }
   //
   //6.send emailJWT về client đế xác thức email(verify)
-  async resendVerifyEmail(user_id: string) {
+  async resendVerifyEmail(user_id: string, email: string) {
     const email_verify_token = await this.signEmailVerifyToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
     console.log('Resend verify token', email_verify_token)
+    // await sendVerifyRegisterEmail(email, email_verify_token) //send Email
     await databaseService.users.updateOne(
       {
         _id: new ObjectId(user_id)
@@ -339,7 +352,7 @@ class UserService {
   //
 
   //7.forgotPassword
-  async forgotPassword({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  async forgotPassword({ user_id, verify, email }: { user_id: string; email: string; verify: UserVerifyStatus }) {
     const forgot_password_token = await this.signForgotPasswordToken({ user_id: user_id, verify: verify })
     await databaseService.users.updateOne(
       {
@@ -354,6 +367,7 @@ class UserService {
         }
       }
     )
+    // await sendForgotPasswordEmail(email, forgot_password_token) // Send email
     //gửi emaill kèm đường link đến email người dùng: https://twitter.com/forgot-password?token=token
     console.log('forgot_password_token: ', forgot_password_token)
     return {

@@ -9,9 +9,11 @@ import mediasService from '~/services/medias.services'
 import { handleUploadImage } from '~/utils/file'
 import fs from 'fs'
 import mime from 'mime'
+import { sendFileFromS3 } from '~/utils/s3'
 // console.log('dirname--------', __dirname)
 // console.log('filename--------', __filename)
 config()
+//upload image
 export const uploadImageController = async (req: Request, res: Response, next: NextFunction) => {
   const url = await mediasService.uploadImage(req)
   return res.json({
@@ -30,7 +32,7 @@ export const serveImageController = (req: Request, res: Response, next: NextFunc
     }
   })
 }
-
+//tạo link xem video
 export const serveVideoStreamController = (req: Request, res: Response, next: NextFunction) => {
   const range = req.headers.range
   if (!range) {
@@ -86,6 +88,8 @@ export const serveVideoStreamController = (req: Request, res: Response, next: Ne
 //
 export const uploadVideoController = async (req: Request, res: Response, next: NextFunction) => {
   const url = await mediasService.uploadVideo(req)
+  console.log(url)
+
   return res.json({
     message: USERS_MESSAGES.UPLOAD_SUCCESS,
     result: url
@@ -117,18 +121,10 @@ export const videoStatusController = async (req: Request, res: Response, next: N
 
 export const serveM3u8Controller = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params
-  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, 'master.m3u8'), (err) => {
-    if (err) {
-      res.status((err as any).status).send('Not found')
-    }
-  })
+  sendFileFromS3(res, `videos-hls/${id}/master.m3u8`)
 }
 
 export const serveSegmentController = (req: Request, res: Response, next: NextFunction) => {
   const { id, v, segment } = req.params
-  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (err) => {
-    if (err) {
-      res.status((err as any).status).send('Not found')
-    }
-  })
+  sendFileFromS3(res, `videos-hls/${id}/${v}/${segment}`)
 }

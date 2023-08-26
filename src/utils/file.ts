@@ -3,7 +3,8 @@ import formidable from 'formidable'
 import fs from 'fs'
 import { File } from 'formidable'
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
-
+import path from 'path'
+import { v4 as uuidv4 } from 'uuid'
 //create folder
 export const initFolder = () => {
   ;[UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_TEMP_DIR].forEach((dir) => {
@@ -57,6 +58,9 @@ export const handleUploadVideo = async (req: Request) => {
   // const formidable = (await import('formidable')).default
 
   //setup video
+  // const idName = uuidv4()
+  // const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName)
+  // fs.mkdirSync(folderPath)
   const form = formidable({
     uploadDir: UPLOAD_VIDEO_DIR,
     maxFields: 1, // maximum 1
@@ -87,6 +91,7 @@ export const handleUploadVideo = async (req: Request) => {
         const ext = getExtension(video.originalFilename as string) //mp4
         fs.renameSync(video.filepath, video.filepath + '.' + ext)
         video.newFilename = video.newFilename + '.' + ext
+        video.filepath = video.filepath + '.' + ext
       })
       resolve(files.video as File[])
     })
@@ -104,4 +109,22 @@ export const getNameFromFullname = (fullname: string) => {
 export const getExtension = (fullname: string) => {
   const nameArr = fullname.split('.')
   return nameArr[nameArr.length - 1]
+}
+
+export const getFiles = (dir: string, files: string[] = []) => {
+  // Get an array of all files and directories in the passed directory using fs.readdirSync
+  const fileList = fs.readdirSync(dir)
+  // Create the full path of the file/directory by concatenating the passed directory and file/directory name
+  for (const file of fileList) {
+    const name = `${dir}/${file}`
+    // Check if the current file/directory is a directory using fs.statSync
+    if (fs.statSync(name).isDirectory()) {
+      // If it is a directory, recursively call the getFiles function with the directory path and the files array
+      getFiles(name, files)
+    } else {
+      // If it is a file, push the full path to the files array
+      files.push(name)
+    }
+  }
+  return files
 }

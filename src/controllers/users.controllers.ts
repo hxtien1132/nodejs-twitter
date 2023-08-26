@@ -45,8 +45,7 @@ export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
   const result = await userService.oauth(code as string)
   const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
-  console.log('urlRedirect', urlRedirect)
-
+  // console.log('urlRedirect', urlRedirect)
   return res.redirect(urlRedirect)
 }
 
@@ -127,7 +126,7 @@ export const resendVerifyEmailController = async (req: Request, res: Response, n
       message: USERS_MESSAGES.EMAIL_ALREADY_EXISTS
     })
   }
-  const result = await userService.resendVerifyEmail(user_id)
+  const result = await userService.resendVerifyEmail(user_id, user.email)
   return res.json(result)
 }
 
@@ -137,8 +136,8 @@ export const forgotPasswordController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { _id, verify } = req.user as User
-  const result = await userService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify })
+  const { _id, verify, email } = req.user as User
+  const result = await userService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify, email })
   return res.json(result)
 }
 

@@ -76,6 +76,11 @@ class TweetsService {
       updated_at: Date
     }>
   }
+  //
+  //
+  //
+  //
+  //
   async getTweetChildren({
     tweet_id,
     tweet_type,
@@ -247,9 +252,9 @@ class TweetsService {
       total
     }
   }
-
   //
-
+  //
+  //
   async getNewFeeds({ user_id, limit, page }: { user_id: string; limit: number; page: number }) {
     const user_id_obj = new ObjectId(user_id)
 
@@ -484,6 +489,7 @@ class TweetsService {
     ])
     const tweet_ids = tweets.map((tweet) => tweet._id as ObjectId)
     const date = new Date()
+    //tăng view
     await databaseService.tweets.updateMany(
       {
         _id: {
@@ -504,7 +510,7 @@ class TweetsService {
     })
     return {
       tweets,
-      total: total[0].total
+      total: total[0]?.total || 0
     }
   }
 }
