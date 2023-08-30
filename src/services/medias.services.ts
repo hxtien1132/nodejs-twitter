@@ -6,7 +6,7 @@ import { Media } from '~/models/Others'
 import { getFiles, getNameFromFullname, handleUploadImage, handleUploadVideo } from '~/utils/file'
 import fs from 'fs'
 import { config } from 'dotenv'
-import { isProduction } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 import { EncodingStatus, MediaType } from '~/constants/enums'
 import databaseService from './database.services'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
@@ -142,7 +142,7 @@ class MediasService {
         fs.unlinkSync(file.filepath) //xóa filepath(uploads/images/term)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/image/${newName}.jpg`
+            ? `${envConfig.host}/static/image/${newName}.jpg`
             : `http://localhost:${process.env.PORT}/static/image/${newName}.jpg`,
           type: MediaType.Image
         }
@@ -185,7 +185,7 @@ class MediasService {
 
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video/${file.newFilename}`
+            ? `${envConfig.host}/static/video/${file.newFilename}`
             : `http://localhost:${process.env.PORT}/static/video/${file.newFilename}`,
           type: MediaType.Video
         }
@@ -228,7 +228,7 @@ class MediasService {
         // await fsPromise.unlink(file.filepath)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video-hls/${newName}/master.m3u8`
+            ? `${envConfig.host}/static/video-hls/${newName}/master.m3u8`
             : `http://localhost:${process.env.PORT}/static/video-hls/${newName}/master.m3u8`,
           type: MediaType.HLS
         }

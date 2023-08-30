@@ -13,6 +13,7 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import Follower from '~/models/schemas/follower.schema'
 import axios from 'axios'
 import { sendForgotPasswordEmail, sendVerifyRegisterEmail } from '~/utils/email'
+import { envConfig } from '~/constants/config'
 config()
 class UserService {
   //create access token
@@ -23,10 +24,10 @@ class UserService {
         token_type: TokenType.AccessToken,
         verify: verify
       },
-      privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
+      privateKey: envConfig.jwtSecretAccessToken as string,
 
       options: {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.accessTokenExpiresIn
       }
     })
   }
@@ -40,7 +41,7 @@ class UserService {
           verify,
           exp
         },
-        privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+        privateKey: envConfig.jwtSecretRefreshToken as string
       })
     }
     return signToken({
@@ -49,10 +50,10 @@ class UserService {
         token_type: TokenType.RefreshToken,
         verify
       },
-      privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+      privateKey: envConfig.jwtSecretRefreshToken as string,
 
       options: {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.refreshTokenExpiresIn
       }
     })
   }
@@ -64,9 +65,9 @@ class UserService {
         token_type: TokenType.EmaillVerifyToken,
         verify
       },
-      privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      privateKey: envConfig.jwtSecretEmailVerifyToken as string,
       options: {
-        expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.emailVerifyTokenExpiresIn
       }
     })
   }
@@ -79,9 +80,9 @@ class UserService {
         token_type: TokenType.EmaillVerifyToken,
         verify
       },
-      privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string,
+      privateKey: envConfig.jwtSecretForgotPasswordToken as string,
       options: {
-        expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.forgotPasswordTokenExpiresIn
       }
     })
   }
@@ -95,16 +96,16 @@ class UserService {
   private decodeRefreshToken(refresh_token: string) {
     return verifyToken({
       token: refresh_token,
-      secretOrPublickey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+      secretOrPublickey: envConfig.jwtSecretRefreshToken as string
     })
   }
   //getOauthGoogleToken(check )
   private async getOauthGoogleToken(code: string) {
     const body = {
       code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      client_id: envConfig.googleClientId,
+      client_secret: envConfig.googleClientSecret,
+      redirect_uri: envConfig.googleRedirectUri,
       grant_type: 'authorization_code'
     }
     const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
@@ -367,7 +368,7 @@ class UserService {
         }
       }
     )
-    // await sendForgotPasswordEmail(email, forgot_password_token) // Send email
+    // await sendForgotPasswordEmail(email, forgot_password_token) // send email
     //gửi emaill kèm đường link đến email người dùng: https://twitter.com/forgot-password?token=token
     console.log('forgot_password_token: ', forgot_password_token)
     return {

@@ -14,7 +14,8 @@ import { NextFunction, Request, Response } from 'express'
 import { TokenPayload } from '~/models/requests/user.requests'
 import { UserVerifyStatus } from '~/constants/enums'
 import { REGEX_USERNAME } from '~/constants/regex'
-
+import { verifyAccessToken } from '~/utils/common'
+import { envConfig } from '~/constants/config'
 //
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -92,7 +93,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
       try {
         const decoded_forgot_password_token = await verifyToken({
           token: value,
-          secretOrPublickey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+          secretOrPublickey: envConfig.jwtSecretForgotPasswordToken as string
         })
         const { user_id } = decoded_forgot_password_token
         const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
@@ -293,29 +294,7 @@ export const accessTokenValidator = validate(
           options: async (value: string, { req }) => {
             //token k truyền
             const access_token = (value || '').split(' ')[1]
-            if (!access_token) {
-              throw new ErrorWithStatus({
-                message: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-
-            try {
-              const decoded_authorization = await verifyToken({
-                token: access_token,
-                secretOrPublickey: process.env.JWT_SECRET_ACCESS_TOKEN as string
-              })
-              ;(req as Request).decoded_authorization = decoded_authorization
-            } catch (error) {
-              //token sai
-              throw new ErrorWithStatus({
-                message: 'token error', //capitalize((error as JsonWebTokenError).message)
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-            // console.log('decoded_authorization', decoded_authorization)
-
-            return true
+            return await verifyAccessToken(access_token, req as Request)
           }
         }
       }
@@ -341,7 +320,7 @@ export const refreshTokenValidator = validate(
             }
             try {
               const [decoded_refresh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretOrPublickey: process.env.JWT_SECRET_REFRESH_TOKEN as string }),
+                verifyToken({ token: value, secretOrPublickey: envConfig.jwtSecretRefreshToken as string }),
                 databaseService.refreshTokens.findOne({ token: value })
               ])
               if (refresh_token === null) {
@@ -387,7 +366,7 @@ export const emailVerifyTokenValidator = validate(
             try {
               const decoded_email_verify_token = await verifyToken({
                 token: value,
-                secretOrPublickey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+                secretOrPublickey: envConfig.jwtSecretEmailVerifyToken as string
               })
 
               ;(req as Request).decoded_email_verify_token = decoded_email_verify_token
@@ -455,7 +434,7 @@ export const veirifyForgotPasswordValidator = validate(
             try {
               const decoded_refresh_token = await verifyToken({
                 token: value,
-                secretOrPublickey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+                secretOrPublickey: envConfig.jwtSecretForgotPasswordToken as string
               })
               const { user_id } = decoded_refresh_token
               const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
@@ -610,6 +589,15 @@ export const followValidator = validate(
       followed_user_id: userIdSchema
     },
     ['body']
+  )
+)
+//
+export const getConversationValidator = validate(
+  checkSchema(
+    {
+      receiver_id: userIdSchema
+    },
+    ['params']
   )
 )
 
